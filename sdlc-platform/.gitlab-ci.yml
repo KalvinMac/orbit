@@ -1,0 +1,124 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+# Cache dependencies between jobs
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - backend/node_modules/
+    - frontend/node_modules/
+
+# Backend tests
+backend-test:
+  stage: test
+  image: node:18-alpine
+  script:
+    - cd backend
+    - npm ci
+    - npm run lint
+    - npm test
+  only:
+    changes:
+      - backend/**/*
+
+# Frontend tests
+frontend-test:
+  stage: test
+  image: node:18-alpine
+  script:
+    - cd frontend
+    - npm ci
+    - npm run lint
+    - npm test
+  only:
+    changes:
+      - frontend/**/*
+
+# Build backend image
+build-backend:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - cd backend
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/backend:latest .
+    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE/backend:latest
+  only:
+    changes:
+      - backend/**/*
+    refs:
+      - main
+
+# Build frontend image
+build-frontend:
+  stage: build
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  script:
+    - cd frontend
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -t $CI_REGISTRY_IMAGE/frontend:latest .
+    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE/frontend:latest
+  only:
+    changes:
+      - frontend/**/*
+    refs:
+      - main
+
+# Deploy to staging environment
+deploy-staging:
+  stage: deploy
+  image: alpine:3.16
+  environment:
+    name: staging
+    url: https://staging.sdlc-platform.example.com
+  before_script:
+    - apk add --no-cache curl
+    - curl -LO "https://dl.k8s.io/release/stable.txt"
+    - curl -LO "https://dl.k8s.io/release/$(cat stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
+    - mkdir -p $HOME/.kube
+    - echo "$KUBE_CONFIG" > $HOME/.kube/config
+  script:
+    - kubectl set image deployment/backend backend=$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -n sdlc-platform
+    - kubectl set image deployment/frontend frontend=$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -n sdlc-platform
+    - kubectl rollout status deployment/backend -n sdlc-platform
+    - kubectl rollout status deployment/frontend -n sdlc-platform
+  only:
+    - main
+
+# Deploy to production environment
+deploy-production:
+  stage: deploy
+  image: alpine:3.16
+  environment:
+    name: production
+    url: https://sdlc-platform.example.com
+  before_script:
+    - apk add --no-cache curl
+    - curl -LO "https://dl.k8s.io/release/stable.txt"
+    - curl -LO "https://dl.k8s.io/release/$(cat stable.txt)/bin/linux/amd64/kubectl"
+    - chmod +x ./kubectl
+    - mv ./kubectl /usr/local/bin/kubectl
+    - mkdir -p $HOME/.kube
+    - echo "$KUBE_CONFIG" > $HOME/.kube/config
+  script:
+    - kubectl set image deployment/backend backend=$CI_REGISTRY_IMAGE/backend:$CI_COMMIT_SHA -n sdlc-platform-prod
+    - kubectl set image deployment/frontend frontend=$CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_SHA -n sdlc-platform-prod
+    - kubectl rollout status deployment/backend -n sdlc-platform-prod
+    - kubectl rollout status deployment/frontend -n sdlc-platform-prod
+  only:
+    - tags
+  when: manual

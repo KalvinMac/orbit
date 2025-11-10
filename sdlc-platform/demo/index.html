@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDLC Platform Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+    <!-- Bootstrap and custom JS -->
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar">
+        <div class="sidebar-brand">
+          SDLC Platform
+        </div>
+        <ul class="sidebar-menu">
+          <li class="active" data-section="dashboard">Dashboard</li>
+          <li data-section="projects">Projects</li>
+          <li data-section="workflow">Workflow</li>
+          <li data-section="requirements">Requirements</li>
+          <li data-section="testcases">Test Cases</li>
+          <li data-section="deployments">Deployments</li>
+          <li data-section="quality">Quality Management</li>
+          <li data-section="settings">Settings</li>
+        </ul>
+      </div>
+      
+      <!-- Content -->
+      <div class="col-md-10">
+        <div class="header d-flex justify-content-between align-items-center">
+          <h4>Dashboard</h4>
+          <div>
+            <span class="badge bg-primary me-2">Admin</span>
+            Admin User
+          </div>
+        </div>
+        
+        <div class="content">
+          <div class="row">
+            <div class="col-md-8">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Project Overview</h5>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Project</th>
+                          <th>Status</th>
+                          <th>Progress</th>
+                          <th>Owner</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>E-commerce Platform</td>
+                          <td><span class="badge status-in-progress">In Progress</span></td>
+                          <td>
+                            <progress value="75" max="100">75%</progress>
+                          </td>
+                          <td>John Smith</td>
+                        </tr>
+                        <tr>
+                          <td>Mobile Banking App</td>
+                          <td><span class="badge status-pending">Planning</span></td>
+                          <td>
+                            <progress value="20" max="100">20%</progress>
+                          </td>
+                          <td>Emily Johnson</td>
+                        </tr>
+                        <tr>
+                          <td>CRM System</td>
+                          <td><span class="badge status-completed">Completed</span></td>
+                          <td>
+                            <progress value="100" max="100">100%</progress>
+                          </td>
+                          <td>Admin User</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <h5>Workflow Phases</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="card phase-card phase-planning mb-3">
+                        <div class="card-body">
+                          <h6 class="card-title">Strategic Planning</h6>
+                          <div class="d-flex justify-content-between">
+                            <span>3 Projects</span>
+                            <span class="badge status-completed">2 Completed</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card phase-card phase-design mb-3">
+                        <div class="card-body">
+                          <h6 class="card-title">Architecture & Design</h6>
+                          <div class="d-flex justify-content-between">
+                            <span>3 Projects</span>
+                            <span class="badge status-in-progress">1 In Progress</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card phase-card phase-implementation mb-3">
+                        <div class="card-body">
+                          <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                          <button class="btn btn-sm btn-outline-secondary" data-action="edit">Edit</button>
+                          <h6 class="card-title">Implementation</h6>
+                          <div class="d-flex justify-content-between">
+                            <span>2 Projects</span>
+                            <span class="badge status-in-progress">2 In Progress</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card phase-card phase-testing mb-3">
+                        <div class="card-body">
+                          <h6 class="card-title">Testing & Validation</h6>
+                          <div class="d-flex justify-content-between">
+                            <span>1 Project</span>
+                            <span class="badge status-pending">1 Pending</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="card phase-card phase-deployment mb-3">
+                        <div class="card-body">
+                          <h6 class="card-title">Deployment & Operations</h6>
+                          <div class="d-flex justify-content-between">
+                            <span>1 Project</span>
+                            <span class="badge status-pending">1 Pending</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Recent Activity</h5>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <strong>Test Case Updated</strong>
+                      <p class="mb-0 text-muted">Login Authentication - TC001</p>
+                      <small class="text-muted">2 hours ago</small>
+                    </li>
+                    <li class="list-group-item">
+                      <strong>Requirement Added</strong>
+                      <p class="mb-0 text-muted">User Profile Management</p>
+                      <small class="text-muted">5 hours ago</small>
+                    </li>
+                    <li class="list-group-item">
+                      <strong>Deployment Completed</strong>
+                      <p class="mb-0 text-muted">CRM System v1.2</p>
+                      <small class="text-muted">1 day ago</small>
+                    </li>
+                    <li class="list-group-item">
+                      <strong>Project Created</strong>
+                      <p class="mb-0 text-muted">Mobile Banking App</p>
+                      <small class="text-muted">2 days ago</small>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              
+              <div class="card">
+                <div class="card-header">
+                  <h5>Quality Management</h5>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <h6>Test Coverage</h6>
+                    <progress value="85" max="100" class="bg-success">85%</progress>
+                  </div>
+                  <div class="mb-3">
+                    <h6>Code Quality</h6>
+                    <progress value="92" max="100" class="bg-primary">92%</progress>
+                  </div>
+                  <div>
+                    <h6>Documentation</h6>
+                    <progress value="78" max="100" class="bg-warning">78%</progress>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/app.js"></script>
+  
+  <!-- Toast container for notifications -->
+  <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+</body>
+</html>

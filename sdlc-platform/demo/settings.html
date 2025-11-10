@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDLC Platform - Settings</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar">
+        <div class="sidebar-brand">
+          SDLC Platform
+        </div>
+        <ul class="sidebar-menu">
+          <li data-section="dashboard">Dashboard</li>
+          <li data-section="projects">Projects</li>
+          <li data-section="workflow">Workflow</li>
+          <li data-section="requirements">Requirements</li>
+          <li data-section="testcases">Test Cases</li>
+          <li data-section="deployments">Deployments</li>
+          <li data-section="quality">Quality Management</li>
+          <li class="active" data-section="settings">Settings</li>
+        </ul>
+      </div>
+      
+      <!-- Content -->
+      <div class="col-md-10">
+        <div class="header d-flex justify-content-between align-items-center">
+          <h4>Settings</h4>
+          <div>
+            <span class="badge bg-primary me-2">Admin</span>
+            Admin User
+          </div>
+        </div>
+        
+        <div class="content">
+          <div class="row mb-4">
+            <div class="col-md-3">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Settings Categories</h5>
+                </div>
+                <div class="card-body p-0">
+                  <div class="list-group list-group-flush">
+                    <a href="#account-settings" class="list-group-item list-group-item-action active">Account Settings</a>
+                    <a href="#user-management" class="list-group-item list-group-item-action">User Management</a>
+                    <a href="#integrations" class="list-group-item list-group-item-action">Integrations</a>
+                    <a href="#workflow-config" class="list-group-item list-group-item-action">Workflow Configuration</a>
+                    <a href="#notifications" class="list-group-item list-group-item-action">Notifications</a>
+                    <a href="#audit-logs" class="list-group-item list-group-item-action">Audit Logs</a>
+                    <a href="#system-settings" class="list-group-item list-group-item-action">System Settings</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-9">
+              <div class="card" id="account-settings">
+                <div class="card-header">
+                  <h5>Account Settings</h5>
+                </div>
+                <div class="card-body">
+                  <form>
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label for="inputFirstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="inputFirstName" value="Admin">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="inputLastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="inputLastName" value="User">
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="inputEmail" class="form-label">Email</label>
+                      <input type="email" class="form-control" id="inputEmail" value="admin@example.com">
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="inputTitle" class="form-label">Job Title</label>
+                      <input type="text" class="form-control" id="inputTitle" value="System Administrator">
+                    </div>
+                    
+                    <div class="mb-3">
+                      <label for="inputDepartment" class="form-label">Department</label>
+                      <input type="text" class="form-control" id="inputDepartment" value="IT Department">
+                    </div>
+                    
+                    <hr>
+                    
+                    <h6>Change Password</h6>
+                    <div class="mb-3">
+                      <label for="inputCurrentPassword" class="form-label">Current Password</label>
+                      <input type="password" class="form-control" id="inputCurrentPassword">
+                    </div>
+                    
+                    <div class="row mb-3">
+                      <div class="col-md-6">
+                        <label for="inputNewPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="inputNewPassword">
+                      </div>
+                      <div class="col-md-6">
+                        <label for="inputConfirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="inputConfirmPassword">
+                      </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                      <button type="submit" class="btn btn-primary" data-action="save">Save Changes</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              
+              <div class="card mt-4" id="user-management">
+                <div class="card-header">
+                  <h5>User Management</h5>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3 d-flex justify-content-between">
+                    <div class="input-group" style="width: 300px;">
+                      <input type="text" class="form-control" placeholder="Search users...">
+                      <button class="btn btn-outline-secondary" type="button">Search</button>
+                    </div>
+                    <button class="btn btn-primary" data-action="add-user">+ Add User</button>
+                  </div>
+                  
+                  <div class="table-responsive">
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Role</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>Admin User</td>
+                          <td>admin@example.com</td>
+                          <td>Admin</td>
+                          <td><span class="badge bg-success">Active</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-action="edit">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" data-action="deactivate">Deactivate</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>John Smith</td>
+                          <td>john.smith@example.com</td>
+                          <td>Developer</td>
+                          <td><span class="badge bg-success">Active</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-action="edit">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" data-action="deactivate">Deactivate</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Emily Johnson</td>
+                          <td>emily.johnson@example.com</td>
+                          <td>Project Manager</td>
+                          <td><span class="badge bg-success">Active</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-action="edit">Edit</button>
+                            <button class="btn btn-sm btn-outline-danger" data-action="deactivate">Deactivate</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>Michael Brown</td>
+                          <td>michael.brown@example.com</td>
+                          <td>QA Engineer</td>
+                          <td><span class="badge bg-secondary">Inactive</span></td>
+                          <td>
+                            <button class="btn btn-sm btn-outline-primary me-1" data-action="edit">Edit</button>
+                            <button class="btn btn-sm btn-outline-success" data-action="activate">Activate</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="card mt-4" id="integrations">
+                <div class="card-header">
+                  <h5>Integrations</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <h6>Jira Integration</h6>
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="jiraSwitch" checked>
+                            </div>
+                          </div>
+                          <p class="card-text text-muted small">Connect to Jira for issue tracking and project management.</p>
+                          <button class="btn btn-sm btn-outline-primary" data-action="configure" data-config-type="Integration">Configure</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <h6>GitHub Integration</h6>
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="githubSwitch" checked>
+                            </div>
+                          </div>
+                          <p class="card-text text-muted small">Connect to GitHub for source code management.</p>
+                          <button class="btn btn-sm btn-outline-primary" data-action="configure" data-config-type="Integration">Configure</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <h6>Jenkins Integration</h6>
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="jenkinsSwitch" checked>
+                            </div>
+                          </div>
+                          <p class="card-text text-muted small">Connect to Jenkins for CI/CD pipelines.</p>
+                          <button class="btn btn-sm btn-outline-primary" data-action="configure" data-config-type="Integration">Configure</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <h6>Slack Integration</h6>
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="slackSwitch" checked>
+                            </div>
+                          </div>
+                          <p class="card-text text-muted small">Connect to Slack for team notifications.</p>
+                          <button class="btn btn-sm btn-outline-primary" data-action="configure" data-config-type="Integration">Configure</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <h6>SonarQube Integration</h6>
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="sonarSwitch">
+                            </div>
+                          </div>
+                          <p class="card-text text-muted small">Connect to SonarQube for code quality analysis.</p>
+                          <button class="btn btn-sm btn-outline-primary" data-action="configure" data-config-type="Integration">Configure</button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                      <div class="card">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center">
+                            <h6>Confluence Integration</h6>
+                            <div class="form-check form-switch">
+                              <input class="form-check-input" type="checkbox" role="switch" id="confluenceSwitch">
+                            </div>
+                          </div>
+                          <p class="card-text text-muted small">Connect to Confluence for documentation.</p>
+                          <button class="btn btn-sm btn-outline-primary" data-action="configure" data-config-type="Integration">Configure</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Other settings sections would go here -->
+              <div class="card mt-4" id="workflow-config">
+                <div class="card-header">
+                  <h5>Workflow Configuration</h5>
+                </div>
+                <div class="card-body">
+                  <p>Configure workflow phases, transitions, and permissions.</p>
+                </div>
+              </div>
+              
+              <div class="card mt-4" id="notifications">
+                <div class="card-header">
+                  <h5>Notifications</h5>
+                </div>
+                <div class="card-body">
+                  <p>Configure email and in-app notification settings.</p>
+                </div>
+              </div>
+              
+              <div class="card mt-4" id="audit-logs">
+                <div class="card-header">
+                  <h5>Audit Logs</h5>
+                </div>
+                <div class="card-body">
+                  <p>View system audit logs and user activity.</p>
+                </div>
+              </div>
+              
+              <div class="card mt-4" id="system-settings">
+                <div class="card-header">
+                  <h5>System Settings</h5>
+                </div>
+                <div class="card-body">
+                  <p>Configure global system settings and defaults.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Toast container for notifications -->
+  <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+  <script src="js/app.js"></script>
+  <script>
+    // Initialize submenu functionality when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // Call the submenu setup function from app.js
+      setupSubMenus();
+    });
+  </script>
+</body>
+</html>

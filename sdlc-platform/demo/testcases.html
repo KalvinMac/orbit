@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SDLC Platform - Test Cases</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar">
+        <div class="sidebar-brand">
+          SDLC Platform
+        </div>
+        <ul class="sidebar-menu">
+          <li data-section="dashboard">Dashboard</li>
+          <li data-section="projects">Projects</li>
+          <li data-section="workflow">Workflow</li>
+          <li data-section="requirements">Requirements</li>
+          <li class="active" data-section="testcases">Test Cases</li>
+          <li data-section="deployments">Deployments</li>
+          <li data-section="quality">Quality Management</li>
+          <li data-section="settings">Settings</li>
+        </ul>
+      </div>
+      
+      <!-- Content -->
+      <div class="col-md-10">
+        <div class="header d-flex justify-content-between align-items-center">
+          <h4>Test Cases</h4>
+          <div>
+            <span class="badge bg-primary me-2">Admin</span>
+            Admin User
+          </div>
+        </div>
+        
+        <div class="content">
+          <div class="row mb-4">
+            <div class="col-12">
+              <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <h5>Test Case Management</h5>
+                  <div>
+                    <select class="form-select form-select-sm d-inline-block w-auto me-2">
+                      <option>E-commerce Platform</option>
+                      <option>Mobile Banking App</option>
+                      <option>CRM System</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" data-action="add-test">+ Add Test Case</button>
+                  </div>
+                </div>
+                <div class="card-body">
+                  <ul class="nav nav-tabs" id="testTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-tab-pane" type="button" role="tab">All Tests</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="passed-tab" data-bs-toggle="tab" data-bs-target="#passed-tab-pane" type="button" role="tab">Passed</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="failed-tab" data-bs-toggle="tab" data-bs-target="#failed-tab-pane" type="button" role="tab">Failed</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-tab-pane" type="button" role="tab">Pending</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                      <button class="nav-link" id="runs-tab" data-bs-toggle="tab" data-bs-target="#runs-tab-pane" type="button" role="tab">Test Runs</button>
+                    </li>
+                  </ul>
+                  
+                  <div class="tab-content pt-3" id="testTabContent">
+                    <div class="tab-pane fade show active" id="all-tab-pane" role="tabpanel" aria-labelledby="all-tab" tabindex="0">
+                      <div class="table-responsive">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>ID</th>
+                              <th>Title</th>
+                              <th>Type</th>
+                              <th>Priority</th>
+                              <th>Status</th>
+                              <th>Linked Requirement</th>
+                              <th>Last Run</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>TC-001</td>
+                              <td>User Registration Validation</td>
+                              <td>Functional</td>
+                              <td><span class="badge priority-high">High</span></td>
+                              <td><span class="badge test-status-passed">Passed</span></td>
+                              <td>REQ-001</td>
+                              <td>2025-10-31</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TC-002</td>
+                              <td>User Login Authentication</td>
+                              <td>Functional</td>
+                              <td><span class="badge priority-high">High</span></td>
+                              <td><span class="badge test-status-passed">Passed</span></td>
+                              <td>REQ-001</td>
+                              <td>2025-10-31</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TC-003</td>
+                              <td>Product Listing Display</td>
+                              <td>Functional</td>
+                              <td><span class="badge priority-medium">Medium</span></td>
+                              <td><span class="badge test-status-failed">Failed</span></td>
+                              <td>REQ-002</td>
+                              <td>2025-10-30</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TC-004</td>
+                              <td>Product Search Functionality</td>
+                              <td>Functional</td>
+                              <td><span class="badge priority-medium">Medium</span></td>
+                              <td><span class="badge test-status-pending">Pending</span></td>
+                              <td>REQ-002</td>
+                              <td>-</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TC-005</td>
+                              <td>Shopping Cart Add Item</td>
+                              <td>Functional</td>
+                              <td><span class="badge priority-high">High</span></td>
+                              <td><span class="badge test-status-pending">Pending</span></td>
+                              <td>REQ-003</td>
+                              <td>-</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TC-006</td>
+                              <td>Shopping Cart Update Quantity</td>
+                              <td>Functional</td>
+                              <td><span class="badge priority-medium">Medium</span></td>
+                              <td><span class="badge test-status-pending">Pending</span></td>
+                              <td>REQ-003</td>
+                              <td>-</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>TC-007</td>
+                              <td>Load Test - 500 Concurrent Users</td>
+                              <td>Performance</td>
+                              <td><span class="badge priority-medium">Medium</span></td>
+                              <td><span class="badge test-status-passed">Passed</span></td>
+                              <td>REQ-006</td>
+                              <td>2025-10-29</td>
+                              <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" data-action="view">View</button>
+                                <button class="btn btn-sm btn-outline-success" data-action="run">Run</button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    
+                    <!-- Other tabs would have similar content but filtered -->
+                    <div class="tab-pane fade" id="passed-tab-pane" role="tabpanel" aria-labelledby="passed-tab" tabindex="0">
+                      <p>Showing only passed tests...</p>
+                    </div>
+                    <div class="tab-pane fade" id="failed-tab-pane" role="tabpanel" aria-labelledby="failed-tab" tabindex="0">
+                      <p>Showing only failed tests...</p>
+                    </div>
+                    <div class="tab-pane fade" id="pending-tab-pane" role="tabpanel" aria-labelledby="pending-tab" tabindex="0">
+                      <p>Showing only pending tests...</p>
+                    </div>
+                    <div class="tab-pane fade" id="runs-tab-pane" role="tabpanel" aria-labelledby="runs-tab" tabindex="0">
+                      <p>Showing test run history...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Test Coverage Analysis</h5>
+                </div>
+                <div class="card-body">
+                  <h6>Coverage by Requirement</h6>
+                  <div class="progress mb-3" style="height: 20px;">
+                    <div class="progress-bar bg-success" style="width: 80%">80% (4 of 5 requirements covered)</div>
+                  </div>
+                  
+                  <h6 class="mt-4">Test Results</h6>
+                  <div class="d-flex justify-content-between mb-2">
+                    <span>Passed</span>
+                    <span>3</span>
+                  </div>
+                  <div class="progress mb-3" style="height: 15px;">
+                    <div class="progress-bar bg-success" style="width: 43%">43%</div>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between mb-2">
+                    <span>Failed</span>
+                    <span>1</span>
+                  </div>
+                  <div class="progress mb-3" style="height: 15px;">
+                    <div class="progress-bar bg-danger" style="width: 14%">14%</div>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between mb-2">
+                    <span>Pending</span>
+                    <span>3</span>
+                  </div>
+                  <div class="progress mb-3" style="height: 15px;">
+                    <div class="progress-bar bg-secondary" style="width: 43%">43%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Recent Test Activities</h5>
+                </div>
+                <div class="card-body">
+                  <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">TC-001 Test Run</h6>
+                        <small class="text-success">Passed</small>
+                      </div>
+                      <p class="mb-1">User Registration Validation</p>
+                      <small>Run by: Admin User - 2025-10-31</small>
+                    </li>
+                    <li class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">TC-002 Test Run</h6>
+                        <small class="text-success">Passed</small>
+                      </div>
+                      <p class="mb-1">User Login Authentication</p>
+                      <small>Run by: Admin User - 2025-10-31</small>
+                    </li>
+                    <li class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">TC-003 Test Run</h6>
+                        <small class="text-danger">Failed</small>
+                      </div>
+                      <p class="mb-1">Product Listing Display</p>
+                      <small>Run by: John Smith - 2025-10-30</small>
+                    </li>
+                    <li class="list-group-item">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">TC-007 Test Run</h6>
+                        <small class="text-success">Passed</small>
+                      </div>
+                      <p class="mb-1">Load Test - 500 Concurrent Users</p>
+                      <small>Run by: Emily Johnson - 2025-10-29</small>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <!-- Toast container for notifications -->
+  <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+  <script src="js/app.js"></script>
+</body>
+</html>
