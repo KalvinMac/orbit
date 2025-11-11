@@ -5,7 +5,15 @@ const appState = {
   currentProject: 'E-commerce Platform',
   currentUser: 'Admin User',
   userRole: 'Admin',
-  notifications: 3
+  notifications: 3,
+  integrations: {
+    jiraCloud: {
+      connected: true,
+      syncItems: ['requirements', 'test-cases', 'deployments', 'risks', 'fmea'],
+      lastSync: new Date().toISOString(),
+      syncStatus: 'Successful'
+    }
+  }
 };
 
 // Common utility functions
@@ -359,6 +367,59 @@ function setupActionButtons() {
   });
 }
 
+// Function to show risk and FMEA details modal
+function showRiskFmeaDetails(type, itemName) {
+  const title = type === 'risk' ? 'Risk Details' : 'FMEA Analysis Details';
+  const modalContent = `
+    <div class="mb-3">
+      <h6>${itemName}</h6>
+      <p>The following ${type === 'risk' ? 'risk assessment' : 'FMEA analysis'} details are synchronized with Jira Cloud:</p>
+    </div>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">${type === 'risk' ? 'Risk ID' : 'FMEA ID'}</th>
+          <th scope="col">Description</th>
+          <th scope="col">${type === 'risk' ? 'Impact' : 'Failure Mode'}</th>
+          <th scope="col">${type === 'risk' ? 'Likelihood' : 'Effect'}</th>
+          <th scope="col">Severity</th>
+          <th scope="col">Mitigation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>${type === 'risk' ? 'R-101' : 'F-201'}</td>
+          <td>${type === 'risk' ? 'Security vulnerability in authentication' : 'Database connection failure'}</td>
+          <td>${type === 'risk' ? 'High' : 'Application crash'}</td>
+          <td>${type === 'risk' ? 'Medium' : 'Complete data loss'}</td>
+          <td>High</td>
+          <td>${type === 'risk' ? 'Implement OAuth 2.0 and MFA' : 'Implement connection pooling and retry logic'}</td>
+        </tr>
+        <tr>
+          <td>${type === 'risk' ? 'R-102' : 'F-202'}</td>
+          <td>${type === 'risk' ? 'Performance bottleneck in API' : 'Memory leak in UI component'}</td>
+          <td>${type === 'risk' ? 'Medium' : 'Gradual performance degradation'}</td>
+          <td>${type === 'risk' ? 'High' : 'Application becomes unresponsive'}</td>
+          <td>Medium</td>
+          <td>${type === 'risk' ? 'Implement caching and query optimization' : 'Fix memory management in component lifecycle'}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="alert alert-info">
+      <small>This data is synchronized with Jira Cloud. Last sync: ${new Date().toLocaleString()}</small>
+    </div>
+  `;
+
+  showModal({
+    title,
+    body: modalContent,
+    size: 'lg',
+    primaryAction: {
+      label: 'Close'
+    }
+  });
+}
+
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
   // Setup navigation between pages
@@ -376,6 +437,26 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize all action buttons
   setupActionButtons();
+  
+  // Add event listeners for risk and FMEA items
+  document.querySelectorAll('.list-group-item:contains("Risk"), .list-group-item:contains("FMEA")').forEach(item => {
+    if (!item.hasAttribute('data-risk-fmea-initialized')) {
+      item.style.cursor = 'pointer';
+      item.addEventListener('click', function() {
+        const itemText = this.textContent.trim();
+        const isRisk = itemText.includes('Risk');
+        showRiskFmeaDetails(isRisk ? 'risk' : 'fmea', itemText.split('\n')[0].trim());
+      });
+      item.setAttribute('data-risk-fmea-initialized', 'true');
+    }
+  });
+  
+  // Add contains selector for jQuery-like functionality
+  if (!HTMLElement.prototype.contains) {
+    Element.prototype.contains = function(text) {
+      return this.textContent.includes(text);
+    };
+  }
 });
 
 // Helper function to be called by pages with submenus

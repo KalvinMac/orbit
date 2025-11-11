@@ -188,20 +188,43 @@
               
               <div class="card">
                 <div class="card-header">
-                  <h5>Quality Management</h5>
+                  <h5>Project Metrics</h5>
                 </div>
                 <div class="card-body">
                   <div class="mb-3">
-                    <h6>Test Coverage</h6>
-                    <progress value="85" max="100" class="bg-success">85%</progress>
+                    <h6>Recent Projects Created</h6>
+                    <div class="d-flex justify-content-between">
+                      <small>Last 30 days</small>
+                      <small><strong>3</strong></small>
+                    </div>
+                    <progress value="3" max="10" class="bg-primary">3</progress>
                   </div>
                   <div class="mb-3">
-                    <h6>Code Quality</h6>
-                    <progress value="92" max="100" class="bg-primary">92%</progress>
+                    <h6>Deployment Frequency</h6>
+                    <div class="d-flex justify-content-between">
+                      <small>Deployments per week</small>
+                      <small><strong>5</strong></small>
+                    </div>
+                    <progress value="5" max="10" class="bg-success">5</progress>
+                  </div>
+                  <div class="mb-3">
+                    <h6>Deployment Success Rate</h6>
+                    <div class="d-flex justify-content-between">
+                      <small>Last 10 deployments</small>
+                      <small><strong>90%</strong></small>
+                    </div>
+                    <progress value="90" max="100" class="bg-info">90%</progress>
                   </div>
                   <div>
-                    <h6>Documentation</h6>
-                    <progress value="78" max="100" class="bg-warning">78%</progress>
+                    <h6>Risk Status</h6>
+                    <div class="d-flex justify-content-between">
+                      <small>Open vs. Mitigated</small>
+                      <small><strong>24/12</strong></small>
+                    </div>
+                    <div class="progress">
+                      <div class="progress-bar bg-danger" style="width: 66%">Open</div>
+                      <div class="progress-bar bg-success" style="width: 34%">Mitigated</div>
+                    </div>
                   </div>
                 </div>
               </div>
