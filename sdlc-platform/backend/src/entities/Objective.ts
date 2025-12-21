@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { ObjectType, Field, ID, Float } from 'type-graphql';
 import { StrategicGoal } from './StrategicGoal';
 import { User } from './User';
@@ -33,14 +33,18 @@ export class Objective {
     @JoinColumn({ name: 'strategicGoalId' })
     strategicGoal: StrategicGoal;
 
-    @Field(() => ID, { nullable: true })
-    @Column({ type: 'uuid', nullable: true })
-    ownerId: string;
+    @Field(() => String)
+    @Column({ type: 'varchar', default: 'not_started' })
+    status: string;
 
-    @Field(() => User, { nullable: true })
-    @ManyToOne(() => User, { nullable: true })
-    @JoinColumn({ name: 'ownerId' })
-    owner: User;
+    @Field(() => [User], { nullable: true })
+    @ManyToMany(() => User)
+    @JoinTable({
+        name: 'objective_owners',
+        joinColumn: { name: 'objectiveId', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' }
+    })
+    owners: User[];
 
     @Field(() => [KeyResult], { nullable: true })
     @OneToMany(() => KeyResult, kr => kr.objective)

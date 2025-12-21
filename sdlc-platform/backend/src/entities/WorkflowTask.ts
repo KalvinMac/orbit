@@ -122,11 +122,11 @@ export class WorkflowTask {
   @Column({ type: 'text', nullable: true })
   description: string | null;
 
-  @Field(() => PhaseTask)
-  @Column({ type: 'varchar', length: 50 })
-  taskType: PhaseTask;
+  @Field(() => String)
+  @Column({ type: 'varchar', length: 100, default: 'custom' })
+  taskType: string;
 
-  @Field(() => TaskStatus)
+  @Field(() => String)
   @Column({ type: 'varchar', length: 20 })
   status: TaskStatus;
 
@@ -146,7 +146,7 @@ export class WorkflowTask {
   @Column({ type: 'uuid', nullable: true })
   assignedToId: string | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'date', nullable: true })
   dueDate: Date | null;
 

@@ -2,6 +2,7 @@ import { Resolver, Query, Mutation, Arg, ID } from 'type-graphql';
 import { StrategicGoal, GoalStatus } from '../entities/StrategicGoal';
 import { Objective } from '../entities/Objective';
 import { KeyResult } from '../entities/KeyResult';
+import { User } from '../entities/User';
 import { AppDataSource } from '../config/data-source';
 
 @Resolver()
@@ -13,24 +14,55 @@ export class OKRResolver {
     // --- Strategic Goals ---
     @Query(() => [StrategicGoal])
     async strategicGoals(): Promise<StrategicGoal[]> {
-        return this.goalRepo.find({ order: { createdAt: 'DESC' } });
+        return this.goalRepo.find({ relations: ['owners'], order: { createdAt: 'DESC' } });
     }
 
     @Mutation(() => StrategicGoal)
     async createStrategicGoal(
         @Arg('title') title: string,
         @Arg('description', { nullable: true }) description?: string,
-        @Arg('ownerId', { nullable: true }) ownerId?: string
+        @Arg('ownerIds', () => [String], { nullable: true }) ownerIds?: string[]
     ): Promise<StrategicGoal> {
-        const goal = this.goalRepo.create({ title, description, ownerId });
+        let owners: User[] = [];
+        if (ownerIds && ownerIds.length > 0) {
+            owners = await AppDataSource.getRepository(User).findByIds(ownerIds);
+        }
+        const goal = this.goalRepo.create({ title, description, owners });
         return this.goalRepo.save(goal);
+    }
+
+    @Mutation(() => StrategicGoal)
+    async updateStrategicGoal(
+        @Arg('id') id: string,
+        @Arg('title', { nullable: true }) title?: string,
+        @Arg('description', { nullable: true }) description?: string,
+        @Arg('status', { nullable: true }) status?: string,
+        @Arg('ownerIds', () => [String], { nullable: true }) ownerIds?: string[]
+    ): Promise<StrategicGoal> {
+        const goal = await this.goalRepo.findOne({ where: { id }, relations: ['owners'] });
+        if (!goal) throw new Error('Strategic Goal not found');
+
+        if (title !== undefined) goal.title = title;
+        if (description !== undefined) goal.description = description;
+        if (status !== undefined) goal.status = status as GoalStatus;
+        if (ownerIds !== undefined) {
+            goal.owners = await AppDataSource.getRepository(User).findByIds(ownerIds);
+        }
+
+        return this.goalRepo.save(goal);
+    }
+
+    @Mutation(() => Boolean)
+    async deleteStrategicGoal(@Arg('id') id: string): Promise<boolean> {
+        const result = await this.goalRepo.delete(id);
+        return result.affected !== 0;
     }
 
     // --- Objectives ---
     @Query(() => [Objective])
     async objectives(@Arg('goalId', { nullable: true }) goalId?: string): Promise<Objective[]> {
         const where = goalId ? { strategicGoalId: goalId } : {};
-        return this.objectiveRepo.find({ where, relations: ['keyResults', 'projects'], order: { createdAt: 'DESC' } });
+        return this.objectiveRepo.find({ where, relations: ['keyResults', 'projects', 'owners'], order: { createdAt: 'DESC' } });
     }
 
     @Mutation(() => Objective)
@@ -39,10 +71,52 @@ export class OKRResolver {
         @Arg('strategicGoalId') strategicGoalId: string,
         @Arg('description', { nullable: true }) description?: string,
         @Arg('cycle', { nullable: true }) cycle?: string,
-        @Arg('ownerId', { nullable: true }) ownerId?: string
+        @Arg('ownerIds', () => [String], { nullable: true }) ownerIds?: string[],
+        @Arg('status', { nullable: true }) status?: string
     ): Promise<Objective> {
-        const objective = this.objectiveRepo.create({ title, strategicGoalId, description, cycle, ownerId });
+        let owners: User[] = [];
+        if (ownerIds && ownerIds.length > 0) {
+            owners = await AppDataSource.getRepository(User).findByIds(ownerIds);
+        }
+        // status defaults to 'not_started' via database default if undefined
+        const objective = this.objectiveRepo.create({
+            title,
+            strategicGoalId,
+            description,
+            cycle,
+            owners,
+            status: status || 'not_started'
+        });
         return this.objectiveRepo.save(objective);
+    }
+
+    @Mutation(() => Objective)
+    async updateObjective(
+        @Arg('id') id: string,
+        @Arg('title', { nullable: true }) title?: string,
+        @Arg('description', { nullable: true }) description?: string,
+        @Arg('cycle', { nullable: true }) cycle?: string,
+        @Arg('ownerIds', () => [String], { nullable: true }) ownerIds?: string[],
+        @Arg('status', { nullable: true }) status?: string
+    ): Promise<Objective> {
+        const objective = await this.objectiveRepo.findOne({ where: { id }, relations: ['owners'] });
+        if (!objective) throw new Error('Objective not found');
+
+        if (title !== undefined) objective.title = title;
+        if (description !== undefined) objective.description = description;
+        if (cycle !== undefined) objective.cycle = cycle;
+        if (status !== undefined) objective.status = status;
+        if (ownerIds !== undefined) {
+            objective.owners = await AppDataSource.getRepository(User).findByIds(ownerIds);
+        }
+
+        return this.objectiveRepo.save(objective);
+    }
+
+    @Mutation(() => Boolean)
+    async deleteObjective(@Arg('id') id: string): Promise<boolean> {
+        const result = await this.objectiveRepo.delete(id);
+        return result.affected !== 0;
     }
 
     // --- Key Results ---

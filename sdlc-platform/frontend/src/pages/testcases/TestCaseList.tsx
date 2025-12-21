@@ -38,6 +38,8 @@ const GET_DATA = gql`
       type
       priority
       isAutomated
+      jiraLink
+      category
       project {
         id
         name
@@ -56,13 +58,14 @@ const GET_DATA = gql`
       id
       firstName
       lastName
+      email
     }
   }
 `;
 
 const CREATE_TEST_CASE = gql`
-  mutation CreateTestCase($title: String!, $description: String!, $steps: String!, $expectedResults: String!, $projectId: String!, $createdById: String!, $type: TestType, $priority: String, $assignedToId: String) {
-    createTestCase(title: $title, description: $description, steps: $steps, expectedResults: $expectedResults, projectId: $projectId, createdById: $createdById, type: $type, priority: $priority, assignedToId: $assignedToId) {
+  mutation CreateTestCase($title: String!, $description: String!, $steps: String, $expectedResults: String, $projectId: String!, $createdById: String!, $type: String, $priority: String, $assignedToId: String, $jiraLink: String, $category: String) {
+    createTestCase(title: $title, description: $description, steps: $steps, expectedResults: $expectedResults, projectId: $projectId, createdById: $createdById, type: $type, priority: $priority, assignedToId: $assignedToId, jiraLink: $jiraLink, category: $category) {
       id
       title
     }
@@ -88,9 +91,11 @@ const TestCaseList: React.FC = () => {
     expectedResults: '',
     projectId: '',
     createdById: '',
-    type: 'unit',
+    type: 'UNIT',
     priority: 'medium',
-    assignedToId: ''
+    assignedToId: '',
+    jiraLink: '',
+    category: ''
   });
 
   const { loading, error, data, refetch } = useQuery(GET_DATA);
@@ -114,7 +119,7 @@ const TestCaseList: React.FC = () => {
   });
 
   const handleSubmit = () => {
-    if (formData.title && formData.projectId && formData.steps && formData.expectedResults) {
+    if (formData.title && formData.projectId) {
       const variables: any = { ...formData };
       if (!variables.assignedToId) delete variables.assignedToId;
       createTestCase({ variables });
@@ -129,6 +134,13 @@ const TestCaseList: React.FC = () => {
 
   const columns: GridColDef[] = [
     { field: 'title', headerName: 'Title', flex: 1.5, minWidth: 200 },
+    {
+      field: 'jiraLink',
+      headerName: 'Jira Link',
+      width: 150,
+      renderCell: (params) => params.value ? <a href={params.value.startsWith('http') ? params.value : `https://${params.value}`} target="_blank" rel="noopener noreferrer">View in Jira</a> : '-'
+    },
+    { field: 'category', headerName: 'Category', width: 130 },
     { field: 'type', headerName: 'Type', width: 130, renderCell: (params) => <Chip label={params.value} size="small" variant="outlined" /> },
     {
       field: 'priority',
@@ -153,8 +165,8 @@ const TestCaseList: React.FC = () => {
       width: 100,
       type: 'boolean'
     },
+    { field: 'assignedTo', headerName: 'Owner', flex: 1, valueGetter: (params) => params.row.assignedTo ? `${params.row.assignedTo.firstName} ${params.row.assignedTo.lastName}` : 'Unassigned' },
     { field: 'project', headerName: 'Project', flex: 1, valueGetter: (params) => params.row.project?.name || '-' },
-    { field: 'assignedTo', headerName: 'Assigned To', flex: 1, valueGetter: (params) => params.row.assignedTo ? `${params.row.assignedTo.firstName} ${params.row.assignedTo.lastName}` : 'Unassigned' },
     {
       field: 'actions',
       type: 'actions',
@@ -200,33 +212,40 @@ const TestCaseList: React.FC = () => {
         <DialogTitle>New Test Case</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Title" fullWidth value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
-            <TextField label="Description" fullWidth multiline rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+            <TextField label="Title" fullWidth required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} />
+            <TextField label="Jira Link" fullWidth value={formData.jiraLink} onChange={e => setFormData({ ...formData, jiraLink: e.target.value })} placeholder="e.g. https://jira.example.com/browse/TEST-123" />
+            <TextField label="Category" fullWidth value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} />
+            <TextField label="Description" fullWidth multiline rows={2} required value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
             <TextField label="Steps" fullWidth multiline rows={3} placeholder="Step 1... Step 2..." value={formData.steps} onChange={e => setFormData({ ...formData, steps: e.target.value })} />
             <TextField label="Expected Results" fullWidth multiline rows={2} value={formData.expectedResults} onChange={e => setFormData({ ...formData, expectedResults: e.target.value })} />
 
             <Stack direction="row" spacing={2}>
-              <TextField select label="Type" fullWidth value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
-                {TEST_TYPES.map(t => <MenuItem key={t} value={t}>{t.replace('_', ' ').toUpperCase()}</MenuItem>)}
+              <TextField select label="Type" fullWidth required value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
+                {TEST_TYPES.map(t => <MenuItem key={t} value={t.toUpperCase()}>{t.replace('_', ' ').toUpperCase()}</MenuItem>)}
               </TextField>
-              <TextField select label="Priority" fullWidth value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value })}>
+              <TextField select label="Priority" fullWidth required value={formData.priority} onChange={e => setFormData({ ...formData, priority: e.target.value })}>
                 {PRIORITIES.map(p => <MenuItem key={p} value={p}>{p.toUpperCase()}</MenuItem>)}
               </TextField>
             </Stack>
 
-            <TextField select label="Project" fullWidth value={formData.projectId} onChange={e => setFormData({ ...formData, projectId: e.target.value })}>
+            <TextField select label="Project" fullWidth required value={formData.projectId} onChange={e => setFormData({ ...formData, projectId: e.target.value })}>
               {data.projects.map((p: any) => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
             </TextField>
 
-            <TextField select label="Assign To" fullWidth value={formData.assignedToId} onChange={e => setFormData({ ...formData, assignedToId: e.target.value })}>
-              <MenuItem value=""><em>Unassigned</em></MenuItem>
-              {data.users.map((u: any) => <MenuItem key={u.id} value={u.id}>{u.firstName} {u.lastName}</MenuItem>)}
-            </TextField>
+            <Stack direction="row" spacing={2}>
+              <TextField select label="Assign To" fullWidth value={formData.assignedToId} onChange={e => setFormData({ ...formData, assignedToId: e.target.value })}>
+                <MenuItem value=""><em>Unassigned</em></MenuItem>
+                {data.users.map((u: any) => <MenuItem key={u.id} value={u.id}>{u.firstName} {u.lastName}</MenuItem>)}
+              </TextField>
+              <TextField select label="Reporter" fullWidth required value={formData.createdById} onChange={e => setFormData({ ...formData, createdById: e.target.value })}>
+                {data.users.map((u: any) => <MenuItem key={u.id} value={u.id}>{u.firstName} {u.lastName}</MenuItem>)}
+              </TextField>
+            </Stack>
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit} disabled={!formData.title || !formData.projectId || !formData.steps}>Create</Button>
+          <Button variant="contained" onClick={handleSubmit} disabled={!formData.title || !formData.projectId || !formData.createdById}>Create</Button>
         </DialogActions>
       </Dialog>
     </Box>

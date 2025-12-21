@@ -1,6 +1,6 @@
 variable "aws_region" {
   description = "The AWS region to deploy to"
-  default     = "us-east-1"
+  default     = "us-west-2"
 }
 
 variable "app_name" {

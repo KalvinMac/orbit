@@ -7,7 +7,12 @@ import ProjectDetails from './pages/projects/ProjectDetails';
 import RequirementList from './pages/requirements/RequirementList';
 import TestCaseList from './pages/testcases/TestCaseList';
 import DeploymentList from './pages/deployments/DeploymentList';
+import DVFList from './pages/dvf/DVFList';
+import DVFDetails from './pages/dvf/DVFDetails';
+import DVFForm from './pages/dvf/DVFForm';
 import WorkflowDashboard from './pages/workflow/WorkflowDashboard';
+import WorkflowEditor from './pages/workflow/WorkflowEditor';
+import TaskEdit from './pages/workflow/TaskEdit';
 import PlanningPhase from './pages/workflow/PlanningPhase';
 import ArchitecturePhase from './pages/workflow/ArchitecturePhase';
 import ImplementationPhase from './pages/workflow/ImplementationPhase';
@@ -35,6 +40,7 @@ import NotFound from './pages/NotFound';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import OKRDashboard from './pages/okr/OKRDashboard';
+import ActivityList from './pages/activities/ActivityList';
 
 function App() {
   return (
@@ -66,8 +72,16 @@ function App() {
             {/* Deployment Routes */}
             <Route path="/deployments" element={<DeploymentList />} />
 
+            {/* DVF Routes */}
+            <Route path="/dvfs" element={<DVFList />} />
+            <Route path="/dvfs/new" element={<DVFForm />} />
+            <Route path="/dvfs/:id/edit" element={<DVFForm />} />
+            <Route path="/dvfs/:id" element={<DVFDetails />} />
+
             {/* Workflow Routes */}
             <Route path="/workflow" element={<WorkflowDashboard />} />
+            <Route path="/workflow/:phaseId/task/:taskId/edit" element={<TaskEdit />} />
+            <Route path="/projects/:projectId/workflow-editor" element={<WorkflowEditor />} />
             <Route path="/workflow/planning" element={<PlanningPhase />} />
             <Route path="/workflow/architecture" element={<ArchitecturePhase />} />
             <Route path="/workflow/implementation" element={<ImplementationPhase />} />
@@ -94,6 +108,9 @@ function App() {
 
             {/* Settings Routes */}
             <Route path="/settings" element={<Settings />} />
+
+            {/* Activity Routes */}
+            <Route path="/activities" element={<ActivityList />} />
           </Route>
         </Route>
 

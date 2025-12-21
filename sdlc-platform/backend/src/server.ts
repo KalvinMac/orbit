@@ -14,6 +14,12 @@ import { TestCaseResolver } from './resolvers/TestCaseResolver';
 import { DeploymentResolver } from './resolvers/DeploymentResolver';
 import { OKRResolver } from './resolvers/OKRResolver';
 import { AllocationResolver } from './resolvers/AllocationResolver';
+import { DVFResolver } from './resolvers/DVFResolver';
+import { NotificationResolver } from './resolvers/NotificationResolver';
+import { SettingsResolver } from './resolvers/SettingsResolver';
+import { SearchResolver } from './resolvers/SearchResolver';
+import { QualityResolver } from './resolvers/QualityResolver';
+import { ActivityLogResolver } from './resolvers/ActivityLogResolver';
 import { AppDataSource } from './config/data-source';
 import { AuthService } from './services/AuthService';
 
@@ -69,7 +75,7 @@ async function bootstrap() {
     // Create GraphQL server
     const server = new ApolloServer({
       schema: await buildSchema({
-        resolvers: [UserResolver, ProjectResolver, WorkflowResolver, RequirementResolver, TestCaseResolver, DeploymentResolver, OKRResolver, AllocationResolver],
+        resolvers: [UserResolver, ProjectResolver, WorkflowResolver, RequirementResolver, TestCaseResolver, DeploymentResolver, OKRResolver, AllocationResolver, DVFResolver, NotificationResolver, SettingsResolver, SearchResolver, QualityResolver, ActivityLogResolver],
         validate: false,
       }),
       context: ({ req, res }) => ({ req, res }),

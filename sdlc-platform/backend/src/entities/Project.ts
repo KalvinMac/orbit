@@ -6,6 +6,9 @@ import { TestCase } from './TestCase';
 import { Deployment } from './Deployment';
 import { Objective } from './Objective';
 import { ProjectAllocation } from './ProjectAllocation';
+import { DVF } from './DVF';
+import { WorkflowPhase } from './WorkflowPhase';
+import { QualityManagement } from './QualityManagement';
 
 export enum ProjectStatus {
   PLANNING = 'planning',
@@ -47,15 +50,15 @@ export class Project {
   @Column({ type: 'varchar', nullable: true })
   currentPhase: string | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'date', nullable: true })
   startDate: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'date', nullable: true })
   targetEndDate: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'date', nullable: true })
   actualEndDate: Date | null;
 
@@ -98,6 +101,23 @@ export class Project {
   @Field(() => [ProjectAllocation], { nullable: true })
   @OneToMany(() => ProjectAllocation, (allocation) => allocation.project)
   allocations: ProjectAllocation[];
+
+  @Field(() => [WorkflowPhase], { nullable: true })
+  @OneToMany(() => WorkflowPhase, (phase) => phase.project)
+  workflowPhases: WorkflowPhase[];
+
+  @Field(() => [QualityManagement], { nullable: true })
+  @OneToMany(() => QualityManagement, (qm) => qm.project)
+  qualityManagement: QualityManagement[];
+
+  @Field(() => ID, { nullable: true })
+  @Column({ type: 'uuid', nullable: true })
+  dvfId: string | null;
+
+  @Field(() => DVF, { nullable: true })
+  @ManyToOne(() => DVF, (dvf) => dvf.projects, { onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'dvfId' })
+  dvf: DVF | null;
 
   @Field()
   @CreateDateColumn()

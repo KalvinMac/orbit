@@ -35,9 +35,9 @@ export class WorkflowPhase {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Field(() => PhaseType)
-  @Column({ type: 'varchar', length: 20 })
-  phaseType: PhaseType;
+  @Field(() => String)
+  @Column({ type: 'varchar', length: 50, default: 'planning' }) // Increased length for custom names
+  phaseType: string;
 
   @Field(() => PhaseStatus)
   @Column({ type: 'varchar', length: 20 })
@@ -47,11 +47,11 @@ export class WorkflowPhase {
   @Column({ type: 'uuid' })
   projectId: string;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'date', nullable: true })
   startDate: Date | null;
 
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'date', nullable: true })
   endDate: Date | null;
 
@@ -87,14 +87,15 @@ export class WorkflowPhase {
   // Get the name of the phase based on the phase type
   @Field()
   get phaseName(): string {
-    const phaseNames = {
+    const phaseNames: Record<string, string> = {
       [PhaseType.PLANNING]: 'Strategic Planning and Inception',
       [PhaseType.ARCHITECTURE]: 'Architecture and System Design',
       [PhaseType.IMPLEMENTATION]: 'Implementation and Construction',
       [PhaseType.TESTING]: 'Comprehensive Testing and Validation',
       [PhaseType.DEPLOYMENT]: 'Deployment and Operational Readiness'
     };
-    return phaseNames[this.phaseType] || 'Unknown Phase';
+    // If it's a known type, return the fancy name, otherwise return the type itself (capitalized potentially)
+    return phaseNames[this.phaseType] || this.phaseType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
 
   // Get the color for the phase status

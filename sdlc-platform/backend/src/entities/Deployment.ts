@@ -114,6 +114,10 @@ export class Deployment {
   @Column({ type: 'text', nullable: true })
   postDeploymentValidation: string | null;
 
+  @Field(() => [String], { nullable: true })
+  @Column("simple-array", { nullable: true })
+  links: string[];
+
   @Field(() => Project)
   @ManyToOne(() => Project, project => project.deployments, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'projectId' })

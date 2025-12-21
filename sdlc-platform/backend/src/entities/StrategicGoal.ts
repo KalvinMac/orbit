@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { ObjectType, Field, ID, registerEnumType } from 'type-graphql';
 import { User } from './User';
 
@@ -34,14 +34,14 @@ export class StrategicGoal {
     @Column({ type: 'varchar', default: GoalStatus.NOT_STARTED })
     status: GoalStatus;
 
-    @Field(() => ID, { nullable: true })
-    @Column({ type: 'uuid', nullable: true })
-    ownerId: string;
-
-    @Field(() => User, { nullable: true })
-    @ManyToOne(() => User, { nullable: true })
-    @JoinColumn({ name: 'ownerId' })
-    owner: User;
+    @Field(() => [User], { nullable: true })
+    @ManyToMany(() => User)
+    @JoinTable({
+        name: 'strategic_goal_owners',
+        joinColumn: { name: 'goalId', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' }
+    })
+    owners: User[];
 
     @Field()
     @CreateDateColumn()

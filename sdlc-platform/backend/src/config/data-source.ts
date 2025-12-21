@@ -13,6 +13,9 @@ import { StrategicGoal } from '../entities/StrategicGoal';
 import { Objective } from '../entities/Objective';
 import { KeyResult } from '../entities/KeyResult';
 import { ProjectAllocation } from '../entities/ProjectAllocation';
+import { DVF } from '../entities/DVF';
+import { Notification } from '../entities/Notification';
+import { OrganizationSettings } from '../entities/OrganizationSettings';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
@@ -28,7 +31,7 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'sdlc_platform',
   synchronize: process.env.NODE_ENV === 'development',
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, Project, Requirement, TestCase, TestRun, Deployment, WorkflowPhase, WorkflowTask, QualityManagement, StrategicGoal, Objective, KeyResult, ProjectAllocation],
+  entities: [User, Project, Requirement, TestCase, TestRun, Deployment, WorkflowPhase, WorkflowTask, QualityManagement, StrategicGoal, Objective, KeyResult, ProjectAllocation, DVF, Notification, OrganizationSettings],
   migrations: ['src/migrations/**/*.ts'],
   subscribers: ['src/subscribers/**/*.ts'],
 });

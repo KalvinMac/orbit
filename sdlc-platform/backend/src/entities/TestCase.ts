@@ -67,13 +67,21 @@ export class TestCase {
   @Column({ type: 'text', nullable: true })
   prerequisites: string;
 
-  @Field()
-  @Column({ type: 'text' })
+  @Field({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   steps: string;
 
-  @Field()
-  @Column({ type: 'text' })
+  @Field({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   expectedResults: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  jiraLink: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  category: string;
 
   @Field(() => ID)
   @Column({ type: 'uuid' })

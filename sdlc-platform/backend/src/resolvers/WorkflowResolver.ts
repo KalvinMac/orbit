@@ -41,6 +41,31 @@ export class WorkflowResolver {
         });
     }
 
+    @Query(() => [WorkflowTask])
+    async getCriticalPathTasks(@Arg('limit', () => Number, { defaultValue: 20 }) limit: number): Promise<WorkflowTask[]> {
+        // Fetch tasks that are Critical or High priority and not completed
+        // Also fetch relations to calculate risk
+        return this.taskRepository.find({
+            where: [
+                { priority: TaskPriority.CRITICAL, status: TaskStatus.IN_PROGRESS },
+                { priority: TaskPriority.CRITICAL, status: TaskStatus.TODO },
+                { priority: TaskPriority.CRITICAL, status: TaskStatus.BLOCKED },
+                { priority: TaskPriority.HIGH, status: TaskStatus.IN_PROGRESS }, // High priority active tasks
+            ],
+            relations: ['assignedTo', 'project', 'assignedTo.allocations', 'assignedTo.allocations.project'],
+            order: {
+                dueDate: 'ASC', // Earliest deadline first
+                priority: 'DESC' // Critical before High (if enum allows sorting, otherwise handled by query order usually)
+            },
+            take: limit
+        });
+    }
+
+    @Query(() => WorkflowTask, { nullable: true })
+    async getTask(@Arg('id', () => ID) id: string): Promise<WorkflowTask | null> {
+        return this.taskRepository.findOne({ where: { id }, relations: ['assignedTo'] });
+    }
+
     @Query(() => String) // Returning JSON string for simplicity for now, or define an ObjectType
     async getWorkflowMetrics(): Promise<string> {
         // Aggregate progress by phase type across all projects
@@ -121,8 +146,8 @@ export class WorkflowResolver {
         @Arg('phaseId', () => ID) phaseId: string,
         @Arg('title') title: string,
         @Arg('taskType', () => String) taskType: string,
-        @Arg('status', () => TaskStatus, { defaultValue: TaskStatus.TODO }) status: TaskStatus,
-        @Arg('priority', () => TaskPriority, { defaultValue: TaskPriority.MEDIUM }) priority: TaskPriority,
+        @Arg('status', () => String, { defaultValue: 'todo' }) status: string,
+        @Arg('priority', () => String, { defaultValue: 'medium' }) priority: string,
         @Arg('description', { nullable: true }) description?: string,
         @Arg('assignedToId', () => ID, { nullable: true }) assignedToId?: string,
         @Arg('dueDate', { nullable: true }) dueDate?: Date
@@ -132,8 +157,8 @@ export class WorkflowResolver {
             phaseId,
             title,
             taskType: taskType as any,
-            status,
-            priority,
+            status: status as TaskStatus,
+            priority: priority as TaskPriority,
             description,
             assignedToId,
             dueDate
@@ -146,8 +171,8 @@ export class WorkflowResolver {
         @Arg('id', () => ID) id: string,
         @Arg('title', { nullable: true }) title?: string,
         @Arg('description', { nullable: true }) description?: string,
-        @Arg('status', () => TaskStatus, { nullable: true }) status?: TaskStatus,
-        @Arg('priority', () => TaskPriority, { nullable: true }) priority?: TaskPriority,
+        @Arg('status', () => String, { nullable: true }) status?: string,
+        @Arg('priority', () => String, { nullable: true }) priority?: string,
         @Arg('assignedToId', () => ID, { nullable: true }) assignedToId?: string,
         @Arg('dueDate', { nullable: true }) dueDate?: Date
     ): Promise<WorkflowTask> {
@@ -156,8 +181,8 @@ export class WorkflowResolver {
 
         if (title !== undefined) task.title = title;
         if (description !== undefined) task.description = description;
-        if (status !== undefined) task.status = status;
-        if (priority !== undefined) task.priority = priority;
+        if (status !== undefined) task.status = status as TaskStatus;
+        if (priority !== undefined) task.priority = priority as TaskPriority;
         if (assignedToId !== undefined) task.assignedToId = assignedToId;
         if (dueDate !== undefined) task.dueDate = dueDate;
 
@@ -168,5 +193,29 @@ export class WorkflowResolver {
     async deleteTask(@Arg('id', () => ID) id: string): Promise<boolean> {
         const result = await this.taskRepository.delete(id);
         return result.affected !== 0;
+    }
+    @Mutation(() => [WorkflowPhase])
+    async initializeWorkflow(@Arg('projectId', () => ID) projectId: string): Promise<WorkflowPhase[]> {
+        const existing = await this.phaseRepository.find({ where: { projectId } });
+        if (existing.length > 0) throw new Error('Workflow already initialized for this project');
+
+        const phases = [
+            { type: 'planning', status: 'not_started' },
+            { type: 'architecture', status: 'not_started' },
+            { type: 'implementation', status: 'not_started' },
+            { type: 'testing', status: 'not_started' },
+            { type: 'deployment', status: 'not_started' }
+        ];
+
+        const createdPhases: WorkflowPhase[] = [];
+        for (const p of phases) {
+            const phase = this.phaseRepository.create({
+                projectId,
+                phaseType: p.type,
+                status: p.status as any
+            });
+            createdPhases.push(await this.phaseRepository.save(phase));
+        }
+        return createdPhases;
     }
 }

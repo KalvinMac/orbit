@@ -63,6 +63,15 @@ const GET_USERS = gql`
   }
 `;
 
+const GET_DVFS = gql`
+  query GetDVFsForProjectSelect {
+    getDVFs {
+      id
+      title
+    }
+  }
+`;
+
 const GET_OBJECTIVES = gql`
   query GetObjectives {
     objectives {
@@ -73,8 +82,8 @@ const GET_OBJECTIVES = gql`
 `;
 
 const CREATE_PROJECT = gql`
-  mutation CreateProject($name: String!, $description: String!, $ownerId: String!, $objectiveId: String) {
-    createProject(name: $name, description: $description, ownerId: $ownerId, objectiveId: $objectiveId) {
+  mutation CreateProject($data: CreateProjectInput!) {
+    createProject(data: $data) {
       id
       name
       status
@@ -104,6 +113,7 @@ interface ProjectFormData {
   description: string;
   ownerId: string;
   objectiveId: string;
+  dvfId: string;
 }
 
 const ProjectList: React.FC = () => {
@@ -116,18 +126,20 @@ const ProjectList: React.FC = () => {
     description: '',
     ownerId: '',
     objectiveId: '',
+    dvfId: '',
   });
 
   // Queries
   const { loading, error, data, refetch } = useQuery(GET_PROJECTS);
   const { data: usersData } = useQuery(GET_USERS);
   const { data: objectivesData } = useQuery(GET_OBJECTIVES);
+  const { data: dvfsData } = useQuery(GET_DVFS);
 
   // Mutations
   const [createProject] = useMutation(CREATE_PROJECT, {
     onCompleted: () => {
       setOpenDialog(false);
-      setFormData({ name: '', description: '', ownerId: '', objectiveId: '' });
+      setFormData({ name: '', description: '', ownerId: '', objectiveId: '', dvfId: '' });
       refetch();
     },
     onError: (err) => console.error(err),
@@ -146,7 +158,15 @@ const ProjectList: React.FC = () => {
 
   const handleSubmit = () => {
     if (formData.name && formData.description && formData.ownerId) {
-      createProject({ variables: formData });
+      createProject({
+        variables: {
+          data: {
+            ...formData,
+            objectiveId: formData.objectiveId || null,
+            dvfId: formData.dvfId || null
+          }
+        }
+      });
     }
   };
 
@@ -339,6 +359,23 @@ const ProjectList: React.FC = () => {
               {objectivesData?.objectives.map((obj: any) => (
                 <MenuItem key={obj.id} value={obj.id}>
                   {obj.title}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              select
+              label="DVF (Recommended)"
+              name="dvfId"
+              fullWidth
+              value={formData.dvfId}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="">
+                <em>None</em>
+              </MenuItem>
+              {dvfsData?.getDVFs.map((dvf: any) => (
+                <MenuItem key={dvf.id} value={dvf.id}>
+                  {dvf.title}
                 </MenuItem>
               ))}
             </TextField>

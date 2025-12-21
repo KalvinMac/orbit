@@ -152,13 +152,24 @@ const WorkflowDashboard: React.FC = () => {
         <Typography variant="h4" component="h1" gutterBottom>
           Product Engineering Workflow
         </Typography>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/projects/new')}
-        >
-          Start New Workflow
-        </Button>
+        <Box>
+          {selectedProjectId && (
+            <Button
+              variant="outlined"
+              sx={{ mr: 2 }}
+              onClick={() => navigate(`/projects/${selectedProjectId}/workflow-editor`)}
+            >
+              Edit Workflow
+            </Button>
+          )}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => navigate('/projects/new')}
+          >
+            Start New Workflow
+          </Button>
+        </Box>
       </Box>
 
       {mappedPhases.length === 0 ? (

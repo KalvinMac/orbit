@@ -42,6 +42,7 @@ const GET_DATA = gql`
       type
       plannedDate
       actualStartDate
+      links
       project {
         id
         name
@@ -60,13 +61,14 @@ const GET_DATA = gql`
       id
       firstName
       lastName
+      email
     }
   }
 `;
 
 const CREATE_DEPLOYMENT = gql`
-  mutation CreateDeployment($name: String!, $version: String!, $projectId: String!, $deployedById: String!, $plannedDate: DateTime!, $type: String!, $environment: String!, $description: String) {
-    createDeployment(name: $name, version: $version, projectId: $projectId, deployedById: $deployedById, plannedDate: $plannedDate, type: $type, environment: $environment, description: $description) {
+  mutation CreateDeployment($name: String!, $version: String!, $projectId: String!, $deployedById: String!, $plannedDate: DateTime!, $type: String!, $environment: String!, $description: String, $links: [String!]) {
+    createDeployment(name: $name, version: $version, projectId: $projectId, deployedById: $deployedById, plannedDate: $plannedDate, type: $type, environment: $environment, description: $description, links: $links) {
       id
       name
     }
@@ -90,10 +92,11 @@ const DeploymentList: React.FC = () => {
     version: '',
     projectId: '',
     deployedById: '',
-    type: 'technical',
-    environment: 'development',
+    type: 'TECHNICAL',
+    environment: 'DEVELOPMENT',
     plannedDate: '',
-    description: ''
+    description: '',
+    links: '' // Helper for text input
   });
 
   const { loading, error, data, refetch } = useQuery(GET_DATA);
@@ -107,7 +110,7 @@ const DeploymentList: React.FC = () => {
   const [createDeployment] = useMutation(CREATE_DEPLOYMENT, {
     onCompleted: () => {
       setOpenDialog(false);
-      setFormData(prev => ({ ...prev, name: '', version: '', description: '', plannedDate: '' }));
+      setFormData(prev => ({ ...prev, name: '', version: '', description: '', plannedDate: '', links: '' }));
       refetch();
     },
     onError: (err) => console.error(err)
@@ -119,8 +122,19 @@ const DeploymentList: React.FC = () => {
 
   const handleSubmit = () => {
     if (formData.name && formData.projectId && formData.plannedDate && formData.version) {
+      // Split links by comma or newline
+      const linkArray = formData.links
+        ? formData.links.split(/[\n,]+/).map(l => l.trim()).filter(l => l.length > 0)
+        : [];
+
       // Ensure plannedDate is converted to ISO string or Date object as expected by backend
-      createDeployment({ variables: { ...formData, plannedDate: new Date(formData.plannedDate) } });
+      createDeployment({
+        variables: {
+          ...formData,
+          plannedDate: new Date(formData.plannedDate),
+          links: linkArray
+        }
+      });
     }
   };
 
@@ -138,6 +152,23 @@ const DeploymentList: React.FC = () => {
       headerName: 'Environment',
       width: 120,
       renderCell: (params) => <Chip label={params.value?.toUpperCase()} size="small" color="primary" variant="outlined" />
+    },
+    {
+      field: 'links',
+      headerName: 'Links',
+      width: 100,
+      renderCell: (params) => {
+        const links = params.value as string[] || [];
+        return links.length > 0 ? (
+          <Stack direction="row" spacing={0.5}>
+            {links.map((link, i) => (
+              <IconButton key={i} size="small" href={link.startsWith('http') ? link : `https://${link}`} target="_blank" rel="noopener noreferrer">
+                <RocketIcon fontSize="inherit" color="action" />
+              </IconButton>
+            ))}
+          </Stack>
+        ) : '-';
+      }
     },
     {
       field: 'status',
@@ -204,33 +235,34 @@ const DeploymentList: React.FC = () => {
         <DialogTitle>New Deployment</DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ mt: 1 }}>
-            <TextField label="Name" fullWidth value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g., v1.0.0 Release" />
-            <TextField label="Version" fullWidth value={formData.version} onChange={e => setFormData({ ...formData, version: e.target.value })} placeholder="1.0.0" />
+            <TextField label="Name" fullWidth required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g., v1.0.0 Release" />
+            <TextField label="Version" fullWidth required value={formData.version} onChange={e => setFormData({ ...formData, version: e.target.value })} placeholder="1.0.0" />
             <TextField label="Description" fullWidth multiline rows={2} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
+            <TextField label="Links" fullWidth multiline rows={2} value={formData.links} onChange={e => setFormData({ ...formData, links: e.target.value })} placeholder="Add links separated by newline or comma" />
 
             <Stack direction="row" spacing={2}>
-              <TextField select label="Environment" fullWidth value={formData.environment} onChange={e => setFormData({ ...formData, environment: e.target.value })}>
-                {ENVIRONMENTS.map(e => <MenuItem key={e} value={e}>{e.toUpperCase()}</MenuItem>)}
+              <TextField select label="Environment" fullWidth required value={formData.environment} onChange={e => setFormData({ ...formData, environment: e.target.value })}>
+                {ENVIRONMENTS.map(e => <MenuItem key={e} value={e.toUpperCase()}>{e.toUpperCase()}</MenuItem>)}
               </TextField>
-              <TextField select label="Type" fullWidth value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
-                {TYPES.map(t => <MenuItem key={t} value={t}>{t.toUpperCase()}</MenuItem>)}
+              <TextField select label="Type" fullWidth required value={formData.type} onChange={e => setFormData({ ...formData, type: e.target.value })}>
+                {TYPES.map(t => <MenuItem key={t} value={t.toUpperCase()}>{t.toUpperCase()}</MenuItem>)}
               </TextField>
             </Stack>
 
-            <TextField label="Planned Date" type="datetime-local" fullWidth InputLabelProps={{ shrink: true }} value={formData.plannedDate} onChange={e => setFormData({ ...formData, plannedDate: e.target.value })} />
+            <TextField label="Planned Date" type="datetime-local" fullWidth required InputLabelProps={{ shrink: true }} value={formData.plannedDate} onChange={e => setFormData({ ...formData, plannedDate: e.target.value })} />
 
-            <TextField select label="Project" fullWidth value={formData.projectId} onChange={e => setFormData({ ...formData, projectId: e.target.value })}>
+            <TextField select label="Project" fullWidth required value={formData.projectId} onChange={e => setFormData({ ...formData, projectId: e.target.value })}>
               {data.projects.map((p: any) => <MenuItem key={p.id} value={p.id}>{p.name}</MenuItem>)}
             </TextField>
 
-            <TextField select label="Deployed By" fullWidth value={formData.deployedById} onChange={e => setFormData({ ...formData, deployedById: e.target.value })}>
+            <TextField select label="Deployed By" fullWidth required value={formData.deployedById} onChange={e => setFormData({ ...formData, deployedById: e.target.value })}>
               {data.users.map((u: any) => <MenuItem key={u.id} value={u.id}>{u.firstName} {u.lastName}</MenuItem>)}
             </TextField>
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit} disabled={!formData.name || !formData.projectId || !formData.version || !formData.plannedDate}>Schedule</Button>
+          <Button variant="contained" onClick={handleSubmit} disabled={!formData.name || !formData.projectId || !formData.version || !formData.plannedDate || !formData.deployedById}>Schedule</Button>
         </DialogActions>
       </Dialog>
     </Box>

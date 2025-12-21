@@ -31,12 +31,13 @@ export class DeploymentResolver {
         @Arg('projectId') projectId: string,
         @Arg('deployedById') deployedById: string,
         @Arg('plannedDate') plannedDate: Date,
-        @Arg('type', () => DeploymentType) type: DeploymentType,
-        @Arg('environment', () => Environment) environment: Environment,
+        @Arg('type', () => String) type: string,
+        @Arg('environment', () => String) environment: string,
         @Arg('description', { nullable: true }) description?: string,
         @Arg('releaseNotes', { nullable: true }) releaseNotes?: string,
         @Arg('deploymentPlan', { nullable: true }) deploymentPlan?: string,
-        @Arg('rollbackPlan', { nullable: true }) rollbackPlan?: string
+        @Arg('rollbackPlan', { nullable: true }) rollbackPlan?: string,
+        @Arg('links', () => [String], { nullable: true }) links?: string[]
     ): Promise<Deployment> {
         const deployment = this.deploymentRepository.create({
             name,
@@ -44,13 +45,14 @@ export class DeploymentResolver {
             projectId,
             deployedById,
             plannedDate,
-            type,
-            environment,
+            type: type as DeploymentType,
+            environment: environment as Environment,
             status: DeploymentStatus.PLANNED,
             description,
             releaseNotes,
             deploymentPlan,
-            rollbackPlan
+            rollbackPlan,
+            links
         });
         return this.deploymentRepository.save(deployment);
     }
@@ -58,24 +60,26 @@ export class DeploymentResolver {
     @Mutation(() => Deployment)
     async updateDeployment(
         @Arg('id') id: string,
-        @Arg('status', () => DeploymentStatus, { nullable: true }) status?: DeploymentStatus,
+        @Arg('status', () => String, { nullable: true }) status?: string,
         @Arg('actualStartDate', { nullable: true }) actualStartDate?: Date,
         @Arg('completionDate', { nullable: true }) completionDate?: Date,
         @Arg('approvedById', { nullable: true }) approvedById?: string,
         @Arg('postDeploymentValidation', { nullable: true }) postDeploymentValidation?: string,
         @Arg('description', { nullable: true }) description?: string,
-        @Arg('releaseNotes', { nullable: true }) releaseNotes?: string
+        @Arg('releaseNotes', { nullable: true }) releaseNotes?: string,
+        @Arg('links', () => [String], { nullable: true }) links?: string[]
     ): Promise<Deployment> {
         const deployment = await this.deploymentRepository.findOne({ where: { id } });
         if (!deployment) throw new Error('Deployment not found');
 
-        if (status !== undefined) deployment.status = status;
+        if (status !== undefined) deployment.status = status as DeploymentStatus;
         if (actualStartDate !== undefined) deployment.actualStartDate = actualStartDate;
         if (completionDate !== undefined) deployment.completionDate = completionDate;
         if (approvedById !== undefined) deployment.approvedById = approvedById;
         if (postDeploymentValidation !== undefined) deployment.postDeploymentValidation = postDeploymentValidation;
         if (description !== undefined) deployment.description = description;
         if (releaseNotes !== undefined) deployment.releaseNotes = releaseNotes;
+        if (links !== undefined) deployment.links = links;
 
         return this.deploymentRepository.save(deployment);
     }

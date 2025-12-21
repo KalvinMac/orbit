@@ -28,29 +28,33 @@ export class TestCaseResolver {
     async createTestCase(
         @Arg('title') title: string,
         @Arg('description') description: string,
-        @Arg('steps') steps: string,
-        @Arg('expectedResults') expectedResults: string,
         @Arg('projectId') projectId: string,
         @Arg('createdById') createdById: string,
-        @Arg('type', () => TestType, { nullable: true }) type?: TestType,
+        @Arg('steps', { nullable: true }) steps?: string,
+        @Arg('expectedResults', { nullable: true }) expectedResults?: string,
+        @Arg('type', () => String, { nullable: true }) type?: string,
         @Arg('priority', { nullable: true }) priority?: 'low' | 'medium' | 'high' | 'critical',
         @Arg('prerequisites', { nullable: true }) prerequisites?: string,
         @Arg('requirementId', { nullable: true }) requirementId?: string,
-        @Arg('assignedToId', { nullable: true }) assignedToId?: string
+        @Arg('assignedToId', { nullable: true }) assignedToId?: string,
+        @Arg('jiraLink', { nullable: true }) jiraLink?: string,
+        @Arg('category', { nullable: true }) category?: string
     ): Promise<TestCase> {
         const testCase = this.testCaseRepository.create({
             title,
             description,
-            steps,
-            expectedResults,
+            steps: steps || '',
+            expectedResults: expectedResults || '',
             projectId,
             createdById,
-            type: type || TestType.UNIT,
+            type: (type as TestType) || TestType.UNIT,
             priority: priority || 'medium',
             status: TestStatus.DRAFT,
             prerequisites: prerequisites || '',
             requirementId,
-            assignedToId
+            assignedToId,
+            jiraLink,
+            category
         });
         return this.testCaseRepository.save(testCase);
     }
@@ -62,14 +66,16 @@ export class TestCaseResolver {
         @Arg('description', { nullable: true }) description?: string,
         @Arg('steps', { nullable: true }) steps?: string,
         @Arg('expectedResults', { nullable: true }) expectedResults?: string,
-        @Arg('status', () => TestStatus, { nullable: true }) status?: TestStatus,
-        @Arg('type', () => TestType, { nullable: true }) type?: TestType,
+        @Arg('status', () => String, { nullable: true }) status?: string,
+        @Arg('type', () => String, { nullable: true }) type?: string,
         @Arg('priority', { nullable: true }) priority?: 'low' | 'medium' | 'high' | 'critical',
         @Arg('prerequisites', { nullable: true }) prerequisites?: string,
         @Arg('requirementId', { nullable: true }) requirementId?: string,
         @Arg('assignedToId', { nullable: true }) assignedToId?: string,
         @Arg('isAutomated', { nullable: true }) isAutomated?: boolean,
-        @Arg('automationScript', { nullable: true }) automationScript?: string
+        @Arg('automationScript', { nullable: true }) automationScript?: string,
+        @Arg('jiraLink', { nullable: true }) jiraLink?: string,
+        @Arg('category', { nullable: true }) category?: string
     ): Promise<TestCase> {
         const testCase = await this.testCaseRepository.findOne({ where: { id } });
         if (!testCase) throw new Error('TestCase not found');
@@ -78,14 +84,16 @@ export class TestCaseResolver {
         if (description !== undefined) testCase.description = description;
         if (steps !== undefined) testCase.steps = steps;
         if (expectedResults !== undefined) testCase.expectedResults = expectedResults;
-        if (status !== undefined) testCase.status = status;
-        if (type !== undefined) testCase.type = type;
+        if (status !== undefined) testCase.status = status as TestStatus;
+        if (type !== undefined) testCase.type = type as TestType;
         if (priority !== undefined) testCase.priority = priority;
         if (prerequisites !== undefined) testCase.prerequisites = prerequisites;
         if (requirementId !== undefined) testCase.requirementId = requirementId;
         if (assignedToId !== undefined) testCase.assignedToId = assignedToId;
         if (isAutomated !== undefined) testCase.isAutomated = isAutomated;
         if (automationScript !== undefined) testCase.automationScript = automationScript;
+        if (jiraLink !== undefined) testCase.jiraLink = jiraLink;
+        if (category !== undefined) testCase.category = category;
 
         return this.testCaseRepository.save(testCase);
     }

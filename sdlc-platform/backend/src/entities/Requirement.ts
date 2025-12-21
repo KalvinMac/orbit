@@ -58,6 +58,15 @@ export class Requirement {
   @Column({ type: 'varchar', length: 50 })
   priority: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  jiraLink: string;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  category: string;
+
+
   @Field(() => ID)
   @Column({ type: 'uuid' })
   projectId: string;

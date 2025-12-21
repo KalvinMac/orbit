@@ -1,6 +1,58 @@
-import { Resolver, Query, Mutation, Arg } from 'type-graphql';
+import { Resolver, Query, Mutation, Arg, Int, InputType, Field } from 'type-graphql';
 import { Project, ProjectStatus } from '../entities/Project';
 import { AppDataSource } from '../config/data-source';
+import { NotificationResolver } from './NotificationResolver';
+
+@InputType()
+class CreateProjectInput {
+    @Field()
+    name: string;
+
+    @Field()
+    description: string;
+
+    @Field()
+    ownerId: string;
+
+    @Field({ nullable: true })
+    objectiveId?: string;
+
+    @Field({ nullable: true })
+    dvfId?: string;
+}
+
+@InputType()
+class UpdateProjectInput {
+    @Field({ nullable: true })
+    name?: string;
+
+    @Field({ nullable: true })
+    description?: string;
+
+    @Field({ nullable: true })
+    status?: string; // Accept string for flexible case handling
+
+    @Field(() => Int, { nullable: true })
+    progress?: number;
+
+    @Field({ nullable: true })
+    startDate?: Date;
+
+    @Field({ nullable: true })
+    targetEndDate?: Date;
+
+    @Field({ nullable: true })
+    ownerId?: string;
+
+    @Field({ nullable: true })
+    leadId?: string;
+
+    @Field({ nullable: true })
+    objectiveId?: string;
+
+    @Field({ nullable: true })
+    dvfId?: string;
+}
 
 @Resolver()
 export class ProjectResolver {
@@ -13,62 +65,114 @@ export class ProjectResolver {
 
     @Query(() => Project, { nullable: true })
     async project(@Arg('id') id: string): Promise<Project | null> {
-        // Validate UUID
         const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-        if (!uuidRegex.test(id)) {
-            return null; // Return null for invalid UUIDs (e.g. "new")
-        }
-        return this.projectRepository.findOne({ where: { id }, relations: ['owner', 'lead'] }) || null;
+        if (!uuidRegex.test(id)) return null;
+        return this.projectRepository.findOne({
+            where: { id },
+            relations: [
+                'owner',
+                'lead',
+                'objective',
+                'dvf',
+                'workflowPhases',
+                'workflowPhases.tasks',
+                'qualityManagement'
+            ],
+            order: {
+                workflowPhases: {
+                    createdAt: 'ASC' // Or some order
+                }
+            }
+        }) || null;
     }
 
     @Mutation(() => Project)
-    async createProject(
-        @Arg('name') name: string,
-        @Arg('description') description: string,
-        @Arg('ownerId') ownerId: string,
-        @Arg('objectiveId', { nullable: true }) objectiveId?: string
-    ): Promise<Project> {
+    async createProject(@Arg('data') data: CreateProjectInput): Promise<Project> {
         const project = this.projectRepository.create({
-            name,
-            description,
+            ...data,
             status: ProjectStatus.PLANNING,
-            ownerId,
-            objectiveId: objectiveId || undefined
+            objectiveId: data.objectiveId || undefined,
+            dvfId: data.dvfId || undefined
         });
-        return this.projectRepository.save(project);
+        const savedProject = await this.projectRepository.save(project);
+
+        try {
+            await NotificationResolver.createNotification(
+                `Project "${savedProject.name}" has been created.`,
+                'info',
+                savedProject.ownerId,
+                savedProject.id,
+                'project'
+            );
+        } catch (error) {
+            console.error('Failed to create notification:', error);
+        }
+
+        return savedProject;
     }
+
     @Mutation(() => Project)
     async updateProject(
         @Arg('id') id: string,
-        @Arg('name', { nullable: true }) name?: string,
-        @Arg('description', { nullable: true }) description?: string,
-        @Arg('status', () => ProjectStatus, { nullable: true }) status?: ProjectStatus,
-        @Arg('progress', () => Number, { nullable: true }) progress?: number,
-        @Arg('startDate', { nullable: true }) startDate?: Date,
-        @Arg('targetEndDate', { nullable: true }) targetEndDate?: Date,
-        @Arg('ownerId', { nullable: true }) ownerId?: string,
-        @Arg('leadId', { nullable: true }) leadId?: string,
-        @Arg('objectiveId', { nullable: true }) objectiveId?: string
+        @Arg('data') data: UpdateProjectInput
     ): Promise<Project> {
         const project = await this.projectRepository.findOne({ where: { id } });
         if (!project) throw new Error('Project not found');
 
-        if (name !== undefined) project.name = name;
-        if (description !== undefined) project.description = description;
-        if (status !== undefined) project.status = status;
-        if (progress !== undefined) project.progress = progress;
-        if (startDate !== undefined) project.startDate = startDate;
-        if (targetEndDate !== undefined) project.targetEndDate = targetEndDate;
-        if (ownerId !== undefined) project.ownerId = ownerId;
-        if (leadId !== undefined) project.leadId = leadId;
-        if (objectiveId !== undefined) project.objectiveId = objectiveId || null;
+        if (data.name !== undefined) project.name = data.name;
+        if (data.description !== undefined) project.description = data.description;
 
-        return this.projectRepository.save(project);
+        // Robust status handling: case-insensitive mapping to Enum
+        if (data.status !== undefined) {
+            const normalizedStatus = data.status.toUpperCase();
+            if (Object.values(ProjectStatus).includes(normalizedStatus as ProjectStatus)) {
+                project.status = normalizedStatus as ProjectStatus;
+            }
+        }
+
+        if (data.progress !== undefined) project.progress = data.progress;
+        if (data.startDate !== undefined) project.startDate = data.startDate;
+        if (data.targetEndDate !== undefined) project.targetEndDate = data.targetEndDate;
+        if (data.ownerId !== undefined) project.ownerId = data.ownerId;
+        if (data.leadId !== undefined) project.leadId = data.leadId;
+        if (data.objectiveId !== undefined) project.objectiveId = data.objectiveId || null;
+        if (data.dvfId !== undefined) project.dvfId = data.dvfId || null;
+
+        const updatedProject = await this.projectRepository.save(project);
+
+        try {
+            await NotificationResolver.createNotification(
+                `Project "${updatedProject.name}" has been updated.`,
+                'info',
+                updatedProject.ownerId,
+                updatedProject.id,
+                'project'
+            );
+        } catch (error) {
+            console.error('Failed to create notification:', error);
+        }
+
+        return updatedProject;
     }
 
     @Mutation(() => Boolean)
     async deleteProject(@Arg('id') id: string): Promise<boolean> {
+        const project = await this.projectRepository.findOne({ where: { id } });
+        if (project) {
+            try {
+                await NotificationResolver.createNotification(
+                    `Project "${project.name}" has been deleted.`,
+                    'warning',
+                    project.ownerId,
+                    null,
+                    'project'
+                );
+            } catch (error) {
+                console.error('Failed to create notification:', error);
+            }
+        }
         const result = await this.projectRepository.delete(id);
         return result.affected !== 0;
     }
 }
+
