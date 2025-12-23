@@ -42,7 +42,7 @@
     "ajv": "^6.12.6",
     "ajv-keywords": "^3.5.2",
     "msw": "^1.1.0",
-    "typescript": "^5.0.2"
+    "typescript": "4.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
